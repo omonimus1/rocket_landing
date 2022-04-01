@@ -1,0 +1,104 @@
+/* Testing with default given parameters  */
+INTIALISATION : RANDOM 
+
+public static InitialisationType initialisationType = InitialisationType.RANDOM;  
+public static SelectionType selectionType = SelectionType.TOURNAMENT;
+public static CrossoverType crossoverType = CrossoverType.TWO_POINTS;
+public static MutationType mutationType = MutationType.STANDARD;
+public static ReplaceType replaceType = ReplaceType.TOURNAMENT;
+public static ActivationType activationType = ActivationType.SELU;
+0.1071  0.2322	
+0.0976  0.1883
+0.0075  0.0774
+0.1119  0.2613
+0.0998  0.2278
+0.1474  0.2817
+0.0993  0.2486
+0.0091  0.0179
+0.1474  0.2521
+0.1154  0.2971
+
+INTIALISATION : RAUGUMENTED
+0.1155  0.2928
+0.1099  0.2247
+0.1296  0.2717
+0.0529  0.1840
+0.1092  0.2169
+0.1080  0.2420
+0.1269  0.2352
+0.1071  0.2354
+0.1071  0.2354
+0.1086   0.2294
+
+----
+/* Testing tournamentSize, have found via experimentation optimal parameters */
+To.Size Training Test
+5	0.0102  0.0198
+5	0.0174	0.0205
+5	0.0137 	0.0380
+5	0.0086	0.0161
+5	0.0154	0.0198
+5	0.0142	0.0156
+5	0.0086	0.0092
+5       0.0205	0.0246
+5       0.0179  0.0180
+5	0.0170	0.0549
+--
+10	0.0121	0.0344
+10	0.0129  0.0144
+10	0.0082	0.0181
+10
+10
+10
+10
+10
+10
+10
+--
+20
+20
+20
+20
+20
+20
+20
+20
+20
+20
+--
+30
+30
+30
+30
+30
+30
+30
+30
+30
+30
+--
+40
+40
+40
+40
+40
+40
+40
+40
+40
+40
+--
+50
+50
+50
+50
+50
+50
+50
+50
+50
+50
+50
+50
+50
+50
