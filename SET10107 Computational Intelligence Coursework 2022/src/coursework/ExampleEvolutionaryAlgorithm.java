@@ -476,17 +476,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		}
 	}
 	
-	public void regeneratePopulation() {
-		// NOT USED. Replace the worst individuals with randomly generated ones
-		population.sort((c1, c2) -> c2.compareTo(c1));
-		for (int i = 0; i < 15; ++i) {
-			//chromosome weights are initialised randomly in the constructor
-			Individual individual = new Individual();
-			population.remove(0);
-			population.add(individual);
-		}
-		evaluateIndividuals(population);
-	}
 
 	/*
 	 * getWorstIndex(): iterate the population list, and returns (if this exists, 
