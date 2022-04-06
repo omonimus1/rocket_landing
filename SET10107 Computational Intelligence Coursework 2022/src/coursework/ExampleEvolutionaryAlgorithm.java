@@ -6,6 +6,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import coursework.Parameters.InitialisationType;
+import coursework.Parameters.SelectionCategory;
 import model.Fitness;
 import model.Individual;
 import model.NeuralNetwork;
@@ -27,49 +28,33 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		best = getBest();
 		System.out.println("Best Individual obtained from the population: " + best);
 		
-        // Set initial temp, cooling rate, and improvement count
-        double temp = 10000;
-        double coolingRate = 0.003;
-
 		// Evolutionary Algorithm processing
 		while (evaluations < Parameters.maxEvaluations) {
 			
 			// Select 2 Individuals from the current population
-			Individual first_parent; 
-			Individual second_parent;
+			Individual first_parent = null, second_parent = null;
 			
-			switch(Parameters.selectionType) {
-				case TOURNAMENT:
-				default:
-					first_parent = tournamentSelect(); 
-					second_parent = tournamentSelect();
-					break;
-				case ROULETTE:
-					first_parent = rouletteSelect(); 
-					second_parent = rouletteSelect();
-					break;
-				case RANK:
-					first_parent = rankSelect(); 
-					second_parent = rankSelect();
-					break;
-				case BEST:
-					population.sort((c1, c2) -> c1.compareTo(c2));
-					first_parent = population
-						.stream()
-						.findFirst()
-						.orElse(null);
-					second_parent = population
-						.stream()
-						.skip(1)
-						.findFirst()
-						.orElse(null);
-					break;
-				case RANDOM:
-					first_parent = randSelect(); 
-					second_parent = randSelect();
+			if( Parameters.selectionCategory == SelectionCategory.TOURNAMENT)
+			{
+				first_parent = tournamentSelect(); 
+				second_parent = tournamentSelect();
 			}
-
-
+			else if( Parameters.selectionCategory == SelectionCategory.RANK_SELECTION)
+			{
+				first_parent = rankSelect(); 
+				second_parent = rankSelect();
+			}
+			else if( Parameters.selectionCategory == SelectionCategory.ROULETTE_SELECTION)
+			{
+				first_parent = rouletteSelect(); 
+				second_parent = rouletteSelect();
+			}
+			else if( Parameters.selectionCategory == SelectionCategory.RANDOM_SELECTION)
+			{
+				first_parent = randSelect(); 
+				second_parent = randSelect();
+			}
+	
 			// Generate children_set by crossover
 			ArrayList<Individual> children_set;
 			switch(Parameters.crossoverType) {
@@ -90,10 +75,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 				
 			//mutate the offspring
 			switch(Parameters.mutationType) {
-			case ANNEALING:
-				mutateAnnealing(children_set, temp);
-				temp *= 1 - coolingRate;
-				break;
 			case CONSTRAINED:
 				constrainedMutation(children_set);
 				break;
@@ -202,27 +183,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return population;
 	}
 	
-	private void partialInitialise() {
-		Individual individual;
-		population.sort((c1, c2) -> c2.compareTo(c1));
-		for (int i = 0; i < 15; ++i) {
-			individual = new Individual();
-			population.remove(0);
-			population.add(individual);
-		}
-		evaluateIndividuals(population);
-	}
-
-	private void keepBestN(int n) {
-		population.sort((c1, c2) -> c2.compareTo(c1));
-		for (int i = 0; i < Parameters.populationSize - n; ++i) {
-			Individual individual = new Individual();
-			population.remove(0);
-			population.add(individual);
-		}
-		evaluateIndividuals(population);
-	}
-	
 	
 	
 	/**
@@ -270,22 +230,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return population.get(-1);
 	}
 
-	// Ranked Fitness proportionate
-	private Individual rankSelectOld() {
-		population.sort((c1, c2) -> c1.compareTo(c2));
-		
-		int rand = Parameters.random.nextInt(Parameters.populationSize);
-		for (int i = 1; i < Parameters.populationSize; i++) {
-			rand--;
-			if (rand < i) {
-				return population.get(i);
-			}
-		}
-		return population.get(-1);
-	}
 	
 	private Individual rankSelect() {
-//		int rankSum = (Parameters.populationSize + 1) * Parameters.populationSize / 2;
 		double[] fitness = new double[Parameters.populationSize];
 		for (int i = 0; i < Parameters.populationSize; i++) {
 	        fitness[i] = i + 1;
@@ -502,49 +448,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		}		
 	}
 	
-    public static double acceptanceProbability(double energy, double newEnergy, double temperature) {
-        // If the new solution is better, accept it
-        if (newEnergy < energy) {
-            return 1.0;
-        }
-        // If the new solution is worse, calculate an acceptance probability
-        return Math.exp((energy - newEnergy) / temperature);
-    }
-	private void mutateAnnealing(ArrayList<Individual> individuals, double temp) {
-		for (Individual individual : individuals) {
-			Individual newIndividual = individual.copy();
-			
-			// Get a random genes in the chromosome (change with next int)
-	        int chromeGenePos1 = (int) (newIndividual.chromosome.length * Parameters.random.nextDouble());
-	        int chromeGenePos2 = (int) (newIndividual.chromosome.length * Parameters.random.nextDouble());
 
-	        // Get the values at selected positions in the chromosome
-	        double geneSwap1 = newIndividual.chromosome[chromeGenePos1];
-	        double geneSwap2 = newIndividual.chromosome[chromeGenePos2];
-
-	        // Swap them
-	        newIndividual.chromosome[chromeGenePos1] = geneSwap2;
-	        newIndividual.chromosome[chromeGenePos2] = geneSwap1;
-	        
-	        // Evaluate fitness
-	        newIndividual.fitness = Fitness.evaluate(newIndividual, this);
-	        
-	        // Get energy of solutions
-	        double currentEnergy = individual.fitness;
-	        double neighbourEnergy = newIndividual.fitness;
-			
-			// Decide if we should accept the neighbour
-	        if (acceptanceProbability(currentEnergy, neighbourEnergy, temp) 
-	        		>= Parameters.random.nextDouble()) {
-	        	individual = newIndividual;
-	        }
-		}
-	}
-	
-	
-	
-	
-	
 	/**
 	 * REPLACEMENT
 	 */
