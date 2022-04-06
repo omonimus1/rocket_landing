@@ -1,23 +1,20 @@
 package coursework;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import coursework.Parameters.InitialisationType;
 import model.Fitness;
 import model.Individual;
 import model.NeuralNetwork;
-import java.util.ArrayList;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.Collections;
-import coursework.Parameters.InitialisationType;
-
 
 
 public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
+	// The Main Evolutionary Loop
 	@Override
-	public void run() {
-		
-		// Set initial temp, cooling rate, and improvement count
-        	double temp = 10000;
-        	double coolingRate = 0.003;
-		
+	public void run() {					
 		// Initialise the population with pseudo-random weights
 		if( Parameters.initialisationType == InitialisationType.AUGMENTED)
 			population = augmentedInitialise();
@@ -29,7 +26,10 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		// Get Individual within the population
 		best = getBest();
 		System.out.println("Best Individual obtained from the population: " + best);
-	
+		
+        // Set initial temp, cooling rate, and improvement count
+        double temp = 10000;
+        double coolingRate = 0.003;
 
 		// Evolutionary Algorithm processing
 		while (evaluations < Parameters.maxEvaluations) {
@@ -115,8 +115,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 					replaceWorst(children_set);
 					break;
 			}
-			
-			if (Parameters.immigration) immigration();  // Inject a new individual
 			
 			best = getBest();
 			System.out.println("Best Individual obtained from the population: " + best);
@@ -587,8 +585,9 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	}
 
 	/*
-	 * getWorstIndex(): 
-	 * @return 
+	 * getWorstIndex(): iterate the population list, and returns (if this exists, 
+	 * 					the index of the worst performing solutions (population member); 
+	 * @return: Index of the worst member found;  
 	 */
 	private int getWorstIndex() {
 		Individual worst_member = null, current_population_member = null;
@@ -606,15 +605,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return index_worst_memer_found;
 	}
 	
-
-    private void immigration() {
-    	ArrayList<Individual> immigrants = new ArrayList<Individual>();
-        Individual newIndividual = new Individual();
-        newIndividual.fitness = Fitness.evaluate(newIndividual, this);
-        
-        immigrants.add(newIndividual);
-        replaceWorst(immigrants);
-    }
 
 	
 	@Override
