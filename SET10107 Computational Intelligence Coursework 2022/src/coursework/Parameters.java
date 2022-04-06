@@ -7,22 +7,7 @@ import model.NeuralNetwork;
 import model.LunarParameters.DataSet;
 
 public class Parameters {
-	public enum InitialisationType { RANDOM, AUGMENTED, POS_NEG } // augmented is best
-	public enum SelectionType { RANDOM, TOURNAMENT, ROULETTE, RANK, BEST }
-	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS, ARITHM }
-	public enum MutationType { STANDARD, CONSTRAINED, ANNEALING }
-	public enum ReplaceType { WORST, TOURNAMENT }
-	public enum ActivationType { TANH, STEP, RELU, LEAKY_R, ELU, SELU, 
-		SWISH, HARD_ELISH }
-	
-	public static InitialisationType initialisationType = InitialisationType.POS_NEG;  
-	public static SelectionType selectionType = SelectionType.TOURNAMENT;
-	public static CrossoverType crossoverType = CrossoverType.TWO_POINTS;
-	public static MutationType mutationType = MutationType.STANDARD;
-	public static ReplaceType replaceType = ReplaceType.TOURNAMENT;
-	public static ActivationType activationType = ActivationType.SELU;
-	
-	private static int numHidden = 13;	// initial: 5 - ultimate: 12
+	private static int numHidden = 12;
 	private static int numGenes = calculateNumGenes();
 	/* 
 	 * minGene: specifies minimum and maximum weight values 
@@ -31,7 +16,7 @@ public class Parameters {
 	public static double minGene = -1; 
 	public static double maxGene = +1; 
 		
-	public static int populationSize = 50; 
+	public static int populationSize = 50; // number of list of solutions to crossover at each iteration; 
 	public static int maxEvaluations = 20000; // cannot be set 20000
 	
 	//Random number generator used throughout the application
@@ -43,7 +28,25 @@ public class Parameters {
 	
 	public static int tournamentSize = 10; // final - 10. (select and replace)
 	
-	public static double mutateRate = 0.45; // probability of changing a gene
+	public enum InitialisationType { RANDOM, AUGMENTED, POS_NEG } // augmented is best
+	public enum SelectionCategory { RANDOM_SELECTION, TOURNAMENT, ROULETTE_SELECTION, RANK_SELECTION}
+	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS, ARITHM }
+	public enum MutationType { STANDARD, CONSTRAINED, ANNEALING }
+	public enum ReplaceType { WORST, TOURNAMENT }
+	public enum ActivationType { TANH, STEP, RELU, LEAKY_R, ELU, SELU, 
+		SWISH, HARD_ELISH }
+	
+	public static InitialisationType initialisationType = InitialisationType.POS_NEG;  
+	public static SelectionCategory selectionCategory = SelectionCategory.TOURNAMENT;
+	public static CrossoverType crossoverType = CrossoverType.TWO_POINTS;
+	public static MutationType mutationType = MutationType.STANDARD;
+	public static ReplaceType replaceType = ReplaceType.TOURNAMENT;
+	public static ActivationType activationType = ActivationType.SELU;
+	
+	
+	// Rate = probability of changing a gene
+	// Change = the maximum +/- adjustment to the gene value
+	public static double mutateRate = 0.45; // Mutation rate for mutation operator
 	public static double mutateChange = 0.95; // Delta change for mutation operator
 	
 	public static double SAcoolingRate = 0.0011;
