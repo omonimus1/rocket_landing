@@ -7,7 +7,6 @@ import model.NeuralNetwork;
 import model.LunarParameters.DataSet;
 
 public class Parameters {
-	// Possible options
 	public enum InitialisationType { RANDOM, AUGMENTED, POS_NEG } // augmented is best
 	public enum SelectionType { RANDOM, TOURNAMENT, ROULETTE, RANK, BEST }
 	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS, ARITHM }
@@ -16,7 +15,6 @@ public class Parameters {
 	public enum ActivationType { TANH, STEP, RELU, LEAKY_R, ELU, SELU, 
 		SWISH, HARD_ELISH }
 	
-	// The ones chosen
 	public static InitialisationType initialisationType = InitialisationType.POS_NEG;  
 	public static SelectionType selectionType = SelectionType.TOURNAMENT;
 	public static CrossoverType crossoverType = CrossoverType.TWO_POINTS;
@@ -28,12 +26,12 @@ public class Parameters {
 	private static int numGenes = calculateNumGenes();
 	/* 
 	 * minGene: specifies minimum and maximum weight values 
-	 * Initial value: -3
+	 * Initial value: -1
 	 */
 	public static double minGene = -1; 
-	public static double maxGene = +1; // initial: +3
+	public static double maxGene = +1; 
 		
-	public static int popSize = 50; // initial: 40
+	public static int populationSize = 50; 
 	public static int maxEvaluations = 20000; // cannot be set 20000
 	
 	//Random number generator used throughout the application
@@ -46,18 +44,15 @@ public class Parameters {
 	public static int tournamentSize = 10; // final - 10. (select and replace)
 	public static boolean immigration = false; // final - false
 	
-	// Parameters for mutation 
+	
 	// Rate = probability of changing a gene
 	// Change = the maximum +/- adjustment to the gene value
-	public static double mutateRate = 0.45; // final 0.45 good 0.45 - def 0.01. Mutation rate for mutation operator
-	public static double mutateChange = 0.95; // final 0.95 good 1.00 - def 0.05. Delta change for mutation operator
+	public static double mutateRate = 0.45; // Mutation rate for mutation operator
+	public static double mutateChange = 0.95; // Delta change for mutation operator
 	
 	public static double SAcoolingRate = 0.0011;
 
-	/**
-	 * Do not change any methods that appear below here.
-	 * 
-	 */
+
 	public static int getNumGenes() {					
 		return numGenes;
 	}
