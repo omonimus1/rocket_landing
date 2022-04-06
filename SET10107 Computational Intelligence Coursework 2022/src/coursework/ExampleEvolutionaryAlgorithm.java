@@ -177,7 +177,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	 */
 	private ArrayList<Individual> initialise() {
 		population = new ArrayList<>();
-		for (int i = 0; i < Parameters.popSize; ++i) {
+		for (int i = 0; i < Parameters.populationSize; ++i) {
 			// chromosome weights are initialised randomly in the constructor
 			Individual individual = new Individual();
 			population.add(individual);
@@ -188,7 +188,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	
 	private ArrayList<Individual> augmentedInitialise() {
 		population = new ArrayList<>();
-		for (int i = 0; i < Parameters.popSize + 1000; i++) {
+		for (int i = 0; i < Parameters.populationSize + 1000; i++) {
 			// chromosome weights are initialised randomly in the constructor
 			Individual individual = new Individual();
 			population.add(individual);
@@ -198,13 +198,13 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return (ArrayList<Individual>) population
 			.stream()
 			.sorted((c1, c2) -> c1.compareTo(c2))
-			.limit(Parameters.popSize)
+			.limit(Parameters.populationSize)
 			.collect(Collectors.toCollection(ArrayList::new));
 	}
 	
 	private ArrayList<Individual> PosNegInitialise() {
 		population = new ArrayList<>();
-		for (int i = 0; i < Parameters.popSize; ++i) {
+		for (int i = 0; i < Parameters.populationSize; ++i) {
 			// chromosome weights are initialised randomly in the constructor
 			Individual individual = new Individual();
 			Individual individual2 = individual.copy();
@@ -238,7 +238,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 
 	private void keepBestN(int n) {
 		population.sort((c1, c2) -> c2.compareTo(c1));
-		for (int i = 0; i < Parameters.popSize - n; ++i) {
+		for (int i = 0; i < Parameters.populationSize - n; ++i) {
 			Individual individual = new Individual();
 			population.remove(0);
 			population.add(individual);
@@ -252,7 +252,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	 * SELECTION
 	 */
 	private Individual randSelect() {
-		Individual parent = population.get(Parameters.random.nextInt(Parameters.popSize));
+		Individual parent = population.get(Parameters.random.nextInt(Parameters.populationSize));
 		return parent.copy();
 	}
 	private Individual tournamentSelect() {
@@ -297,8 +297,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	private Individual rankSelectOld() {
 		population.sort((c1, c2) -> c1.compareTo(c2));
 		
-		int rand = Parameters.random.nextInt(Parameters.popSize);
-		for (int i = 1; i < Parameters.popSize; i++) {
+		int rand = Parameters.random.nextInt(Parameters.populationSize);
+		for (int i = 1; i < Parameters.populationSize; i++) {
 			rand--;
 			if (rand < i) {
 				return population.get(i);
@@ -308,9 +308,9 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	}
 	
 	private Individual rankSelect() {
-//		int rankSum = (Parameters.popSize + 1) * Parameters.popSize / 2;
-		double[] fitness = new double[Parameters.popSize];
-		for (int i = 0; i < Parameters.popSize; i++) {
+//		int rankSum = (Parameters.populationSize + 1) * Parameters.populationSize / 2;
+		double[] fitness = new double[Parameters.populationSize];
+		for (int i = 0; i < Parameters.populationSize; i++) {
 	        fitness[i] = i + 1;
 	    }
 
@@ -335,10 +335,12 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
             x[i] /= n;
         }
     }
+    
     public static int random(double[] prob) {
         int[] ans = random(prob, 1);
         return ans[0];
     }
+    
     public static int[] random(double[] prob, int n) {
         // set up alias table
         double[] q = new double[prob.length];
@@ -402,47 +404,47 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	 * CROSSOVER 
 	 */
 	private ArrayList<Individual> uniformCrossover(Individual first_parent, Individual second_parent){
-		Individual child1 = new Individual();
-		Individual child2 = new Individual();
+		Individual first_children = new Individual();
+		Individual second_children = new Individual();
 		
 		for (int i = 0; i < first_parent.chromosome.length; i++){
 			if(Parameters.random.nextBoolean()){
-			child1.chromosome[i] = first_parent.chromosome[i];
-			child2.chromosome[i] = second_parent.chromosome[i];
+			first_children.chromosome[i] = first_parent.chromosome[i];
+			second_children.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = second_parent.chromosome[i];
-		    child2.chromosome[i] = first_parent.chromosome[i];
+		    first_children.chromosome[i] = second_parent.chromosome[i];
+		    second_children.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
 		ArrayList<Individual> children_set = new ArrayList<>();
-		children_set.add(child1);
-		children_set.add(child2);	
+		children_set.add(first_children);
+		children_set.add(second_children);	
 		return children_set;
 	}
 	private ArrayList<Individual> onePointCrossover(Individual first_parent, Individual second_parent){
-		Individual child1 = new Individual();
-		Individual child2 = new Individual();
+		Individual first_children = new Individual();
+		Individual second_children = new Individual();
 		int cutPoint = Parameters.random.nextInt(first_parent.chromosome.length);
 		
 		for (int i = 0; i < first_parent.chromosome.length; i++){
 			if(i < cutPoint){
-			child1.chromosome[i] = first_parent.chromosome[i];
-			child2.chromosome[i] = second_parent.chromosome[i];
+			first_children.chromosome[i] = first_parent.chromosome[i];
+			second_children.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = second_parent.chromosome[i];
-		    child2.chromosome[i] = first_parent.chromosome[i];
+		    first_children.chromosome[i] = second_parent.chromosome[i];
+		    second_children.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
 		ArrayList<Individual> children_set = new ArrayList<>();
-		children_set.add(child1);
-		children_set.add(child2);	
+		children_set.add(first_children);
+		children_set.add(second_children);	
 		return children_set;
 	}
 	private ArrayList<Individual> twoPointCrossover(Individual first_parent, Individual second_parent){
-		Individual child1 = new Individual();
-		Individual child2 = new Individual();
+		Individual first_children = new Individual();
+		Individual second_children = new Individual();
 		
 		int chromLen = first_parent.chromosome.length;
 		int cutPoint1 = Parameters.random.nextInt(chromLen);
@@ -450,17 +452,17 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		
 		for (int i = 0; i < chromLen; i++){
 			if(i < cutPoint1 || i >= cutPoint2){
-			child1.chromosome[i] = first_parent.chromosome[i];
-			child2.chromosome[i] = second_parent.chromosome[i];
+			first_children.chromosome[i] = first_parent.chromosome[i];
+			second_children.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = second_parent.chromosome[i];
-		    child2.chromosome[i] = first_parent.chromosome[i];
+		    first_children.chromosome[i] = second_parent.chromosome[i];
+		    second_children.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
 		ArrayList<Individual> children_set = new ArrayList<>();
-		children_set.add(child1);
-		children_set.add(child2);	
+		children_set.add(first_children);
+		children_set.add(second_children);	
 		return children_set;
 	}
 	private ArrayList<Individual> arithmeticCrossover(Individual first_parent, Individual second_parent){
