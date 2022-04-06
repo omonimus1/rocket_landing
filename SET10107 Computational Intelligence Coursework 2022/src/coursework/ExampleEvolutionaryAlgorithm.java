@@ -45,78 +45,78 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		while (evaluations < Parameters.maxEvaluations) {
 			
 			// Select 2 Individuals from the current population
-			Individual parent1; 
-			Individual parent2;
+			Individual first_parent; 
+			Individual second_parent;
 			
 			switch(Parameters.selectionType) {
 				case TOURNAMENT:
 				default:
-					parent1 = tournamentSelect(); 
-					parent2 = tournamentSelect();
+					first_parent = tournamentSelect(); 
+					second_parent = tournamentSelect();
 					break;
 				case ROULETTE:
-					parent1 = rouletteSelect(); 
-					parent2 = rouletteSelect();
+					first_parent = rouletteSelect(); 
+					second_parent = rouletteSelect();
 					break;
 				case RANK:
-					parent1 = rankSelect(); 
-					parent2 = rankSelect();
+					first_parent = rankSelect(); 
+					second_parent = rankSelect();
 					break;
 				case BEST:
 					population.sort((c1, c2) -> c1.compareTo(c2));
-					parent1 = population
+					first_parent = population
 						.stream()
 						.findFirst()
 						.orElse(null);
-					parent2 = population
+					second_parent = population
 						.stream()
 						.skip(1)
 						.findFirst()
 						.orElse(null);
 					break;
 				case RANDOM:
-					parent1 = randSelect(); 
-					parent2 = randSelect();
+					first_parent = randSelect(); 
+					second_parent = randSelect();
 			}
 
 
-			// Generate children by crossover
-			ArrayList<Individual> children;
+			// Generate children_set by crossover
+			ArrayList<Individual> children_set;
 			switch(Parameters.crossoverType) {
 				case ARITHM:
-					children = arithmeticCrossover(parent1, parent2);
+					children_set = arithmeticCrossover(first_parent, second_parent);
 					break;
 				case ONE_POINT:
-					children = onePointCrossover(parent1, parent2);
+					children_set = onePointCrossover(first_parent, second_parent);
 					break;
 				case TWO_POINTS:
 				default:
-					children = twoPointCrossover(parent1, parent2);
+					children_set = twoPointCrossover(first_parent, second_parent);
 					break;
 				case UNIFORM:
-					children = uniformCrossover(parent1, parent2);
+					children_set = uniformCrossover(first_parent, second_parent);
 					break;
 			}
 						
-//			evaluateIndividuals(children);
+//			evaluateIndividuals(children_set);
 			
 			//mutate the offspring
 			switch(Parameters.mutationType) {
 			case ANNEALING:
-				mutateAnnealing(children, temp);
+				mutateAnnealing(children_set, temp);
 				temp *= 1 - coolingRate;
 				break;
 			case CONSTRAINED:
-				constrainedMutation(children);
+				constrainedMutation(children_set);
 				break;
 			case STANDARD:
 			default:
-				mutate(children);
+				mutate(children_set);
 				break;
 			}
 			
-			// Evaluate the children
-			evaluateIndividuals(children);
+			// Evaluate the children_set
+			evaluateIndividuals(children_set);
 				
 			// Re-initialise
 //			custEvolutionCount += 7;
@@ -125,14 +125,14 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 //				custEvolutionCount = 0;
 //			} 
 
-			// Replace children in population
+			// Replace children_set in population
 			switch(Parameters.replaceType) {
 				case TOURNAMENT:
 				default:
-					tournamentReplace(children);
+					tournamentReplace(children_set);
 					break;
 				case WORST:
-					replaceWorst(children);
+					replaceWorst(children_set);
 					break;
 			}
 			
@@ -401,77 +401,77 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	/**
 	 * CROSSOVER 
 	 */
-	private ArrayList<Individual> uniformCrossover(Individual parent1, Individual parent2){
+	private ArrayList<Individual> uniformCrossover(Individual first_parent, Individual second_parent){
 		Individual child1 = new Individual();
 		Individual child2 = new Individual();
 		
-		for (int i = 0; i < parent1.chromosome.length; i++){
+		for (int i = 0; i < first_parent.chromosome.length; i++){
 			if(Parameters.random.nextBoolean()){
-			child1.chromosome[i] = parent1.chromosome[i];
-			child2.chromosome[i] = parent2.chromosome[i];
+			child1.chromosome[i] = first_parent.chromosome[i];
+			child2.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = parent2.chromosome[i];
-		    child2.chromosome[i] = parent1.chromosome[i];
+		    child1.chromosome[i] = second_parent.chromosome[i];
+		    child2.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
-		ArrayList<Individual> children = new ArrayList<>();
-		children.add(child1);
-		children.add(child2);	
-		return children;
+		ArrayList<Individual> children_set = new ArrayList<>();
+		children_set.add(child1);
+		children_set.add(child2);	
+		return children_set;
 	}
-	private ArrayList<Individual> onePointCrossover(Individual parent1, Individual parent2){
+	private ArrayList<Individual> onePointCrossover(Individual first_parent, Individual second_parent){
 		Individual child1 = new Individual();
 		Individual child2 = new Individual();
-		int cutPoint = Parameters.random.nextInt(parent1.chromosome.length);
+		int cutPoint = Parameters.random.nextInt(first_parent.chromosome.length);
 		
-		for (int i = 0; i < parent1.chromosome.length; i++){
+		for (int i = 0; i < first_parent.chromosome.length; i++){
 			if(i < cutPoint){
-			child1.chromosome[i] = parent1.chromosome[i];
-			child2.chromosome[i] = parent2.chromosome[i];
+			child1.chromosome[i] = first_parent.chromosome[i];
+			child2.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = parent2.chromosome[i];
-		    child2.chromosome[i] = parent1.chromosome[i];
+		    child1.chromosome[i] = second_parent.chromosome[i];
+		    child2.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
-		ArrayList<Individual> children = new ArrayList<>();
-		children.add(child1);
-		children.add(child2);	
-		return children;
+		ArrayList<Individual> children_set = new ArrayList<>();
+		children_set.add(child1);
+		children_set.add(child2);	
+		return children_set;
 	}
-	private ArrayList<Individual> twoPointCrossover(Individual parent1, Individual parent2){
+	private ArrayList<Individual> twoPointCrossover(Individual first_parent, Individual second_parent){
 		Individual child1 = new Individual();
 		Individual child2 = new Individual();
 		
-		int chromLen = parent1.chromosome.length;
+		int chromLen = first_parent.chromosome.length;
 		int cutPoint1 = Parameters.random.nextInt(chromLen);
 		int cutPoint2 = Parameters.random.nextInt((chromLen - cutPoint1) + 1) + cutPoint1;
 		
 		for (int i = 0; i < chromLen; i++){
 			if(i < cutPoint1 || i >= cutPoint2){
-			child1.chromosome[i] = parent1.chromosome[i];
-			child2.chromosome[i] = parent2.chromosome[i];
+			child1.chromosome[i] = first_parent.chromosome[i];
+			child2.chromosome[i] = second_parent.chromosome[i];
 			} else {
-		    child1.chromosome[i] = parent2.chromosome[i];
-		    child2.chromosome[i] = parent1.chromosome[i];
+		    child1.chromosome[i] = second_parent.chromosome[i];
+		    child2.chromosome[i] = first_parent.chromosome[i];
 			}
 		}
 		
-		ArrayList<Individual> children = new ArrayList<>();
-		children.add(child1);
-		children.add(child2);	
-		return children;
+		ArrayList<Individual> children_set = new ArrayList<>();
+		children_set.add(child1);
+		children_set.add(child2);	
+		return children_set;
 	}
-	private ArrayList<Individual> arithmeticCrossover(Individual parent1, Individual parent2){
+	private ArrayList<Individual> arithmeticCrossover(Individual first_parent, Individual second_parent){
 		Individual child = new Individual();
-		for (int i = 0; i < parent1.chromosome.length; i++){
-			double avgChrom = (parent1.chromosome[i] + parent2.chromosome[i]) / 2;
+		for (int i = 0; i < first_parent.chromosome.length; i++){
+			double avgChrom = (first_parent.chromosome[i] + second_parent.chromosome[i]) / 2;
 			child.chromosome[i] = avgChrom;
 		}
-		ArrayList<Individual> children = new ArrayList<>();
-		children.add(child);
-		return children;
+		ArrayList<Individual> children_set = new ArrayList<>();
+		children_set.add(child);
+		return children_set;
 	}
 	
 	
