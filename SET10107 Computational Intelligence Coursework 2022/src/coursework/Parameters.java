@@ -42,12 +42,8 @@ public class Parameters {
 	public static Class neuralNetworkClass = ExampleEvolutionaryAlgorithm.class;
 	
 	public static int tournamentSize = 10; // final - 10. (select and replace)
-	public static boolean immigration = false; // final - false
 	
-	
-	// Rate = probability of changing a gene
-	// Change = the maximum +/- adjustment to the gene value
-	public static double mutateRate = 0.45; // Mutation rate for mutation operator
+	public static double mutateRate = 0.45; // probability of changing a gene
 	public static double mutateChange = 0.95; // Delta change for mutation operator
 	
 	public static double SAcoolingRate = 0.0011;
