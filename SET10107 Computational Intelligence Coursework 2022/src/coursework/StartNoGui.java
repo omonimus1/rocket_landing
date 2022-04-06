@@ -1,5 +1,4 @@
 package coursework;
-
 import model.Fitness;
 import model.LunarParameters.DataSet;
 import model.NeuralNetwork;
@@ -20,10 +19,10 @@ public class StartNoGui {
 
 		//Set the parameters here or directly in the Parameters Class
 		Parameters.maxEvaluations = 20000; // Used to terminate the EA after this many generations
-		Parameters.popSize = 200; // Population Size
+		Parameters.populationSize = 50; // Population Size
 
 		//number of hidden nodes in the neural network
-		Parameters.setHidden(5);
+		Parameters.setHidden(12);
 		
 		//Set the data set for training 
 		Parameters.setDataSet(DataSet.Training);
