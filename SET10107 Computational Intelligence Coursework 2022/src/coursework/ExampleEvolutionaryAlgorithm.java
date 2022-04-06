@@ -1,47 +1,37 @@
 package coursework;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 import model.Fitness;
 import model.Individual;
 import model.NeuralNetwork;
+import java.util.ArrayList;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.Collections;
+import coursework.Parameters.InitialisationType;
 
 
-/**
- * Implements a basic Evolutionary Algorithm to train a Neural Network
- * You Can Use This Class to implement your EA or implement your own class that extends {@link NeuralNetwork} 
- */
+
 public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
-	// The Main Evolutionary Loop
 	@Override
-	public void run() {					
-		//Initialise a population of Individuals with random weights
-		switch(Parameters.initialisationType) {
-		case AUGMENTED:
-			population = augmentedInitialise();
-			break;
-		case POS_NEG:
-			population = PosNegInitialise();
-			break;
-		case RANDOM:
-		default:
-			population = initialise();
-			break;
-		}
-
-		//Record a copy of the best Individual in the population
-		best = getBest();
-		System.out.println("Best From Initialisation " + best);
+	public void run() {
 		
-        // Set initial temp, cooling rate, and improvement count
-        double temp = 10000;
-        double coolingRate = 0.003;
-//        int custEvolutionCount = 100;
+		// Set initial temp, cooling rate, and improvement count
+        	double temp = 10000;
+        	double coolingRate = 0.003;
+		
+		// Initialise the population with pseudo-random weights
+		if( Parameters.initialisationType == InitialisationType.AUGMENTED)
+			population = augmentedInitialise();
+		else if( Parameters.initialisationType == InitialisationType.POS_NEG)
+			population = PosNegInitialise();
+		else
+			population = initialise();
+			
+		// Get Individual within the population
+		best = getBest();
+		System.out.println("Best Individual obtained from the population: " + best);
+	
 
-		// main EA processing loop
+		// Evolutionary Algorithm processing
 		while (evaluations < Parameters.maxEvaluations) {
 			
 			// Select 2 Individuals from the current population
@@ -97,9 +87,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 					children_set = uniformCrossover(first_parent, second_parent);
 					break;
 			}
-						
-//			evaluateIndividuals(children_set);
-			
+				
 			//mutate the offspring
 			switch(Parameters.mutationType) {
 			case ANNEALING:
@@ -115,15 +103,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 				break;
 			}
 			
-			// Evaluate the children_set
 			evaluateIndividuals(children_set);
-				
-			// Re-initialise
-//			custEvolutionCount += 7;
-//			if (custEvolutionCount >= 1000 && getBest().fitness > 0.15) {
-//				population = initialise();
-//				custEvolutionCount = 0;
-//			} 
 
 			// Replace children_set in population
 			switch(Parameters.replaceType) {
@@ -139,10 +119,9 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			if (Parameters.immigration) immigration();  // Inject a new individual
 			
 			best = getBest();
+			System.out.println("Best Individual obtained from the population: " + best);
 			outputStats();
 		}
-
-//		saveNeuralNetwork();  // save the trained network to disk
 	}
 
 	
@@ -319,15 +298,14 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	    return population.get(random(fitness));
 	}
 	
-    // Helpers from smile (https://github.com/haifengl/smile)
+
     public static double norm1(double[] x) {
-        double norm = 0.0;
+        double normalization = 0.0;
         
-        for (double n : x) {
-            norm += Math.abs(n);
+        for (double normalization_value : x) {
+        	normalization += Math.abs(normalization_value);
         }
-        
-        return norm;
+        return normalization;
     }
     public static void unitize1(double[] x) {
         double n = norm1(x);
@@ -442,15 +420,16 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		children_set.add(second_children);	
 		return children_set;
 	}
+	
 	private ArrayList<Individual> twoPointCrossover(Individual first_parent, Individual second_parent){
 		Individual first_children = new Individual();
 		Individual second_children = new Individual();
 		
-		int chromLen = first_parent.chromosome.length;
-		int cutPoint1 = Parameters.random.nextInt(chromLen);
-		int cutPoint2 = Parameters.random.nextInt((chromLen - cutPoint1) + 1) + cutPoint1;
+		int chromosomeLength = first_parent.chromosome.length;
+		int cutPoint1 = Parameters.random.nextInt(chromosomeLength);
+		int cutPoint2 = Parameters.random.nextInt((chromosomeLength - cutPoint1) + 1) + cutPoint1;
 		
-		for (int i = 0; i < chromLen; i++){
+		for (int i = 0; i < chromosomeLength; i++){
 			if(i < cutPoint1 || i >= cutPoint2){
 			first_children.chromosome[i] = first_parent.chromosome[i];
 			second_children.chromosome[i] = second_parent.chromosome[i];
@@ -607,21 +586,24 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		evaluateIndividuals(population);
 	}
 
-	// Returns the index of the worst member of the population
+	/*
+	 * getWorstIndex(): 
+	 * @return 
+	 */
 	private int getWorstIndex() {
-		Individual worst = null;
-		int idx = -1;
-		for (int i = 0; i < population.size(); i++) {
-			Individual individual = population.get(i);
-			if (worst == null) {
-				worst = individual;
-				idx = i;
-			} else if (individual.fitness > worst.fitness) {
-				worst = individual;
-				idx = i; 
+		Individual worst_member = null, current_population_member = null;
+		int index_worst_memer_found = -1;
+		for (int member_location = 0; member_location < population.size(); member_location++) {
+			current_population_member = population.get(member_location);
+			if (worst_member == null) {
+				worst_member = current_population_member;
+				index_worst_memer_found = member_location;
+			} else if (current_population_member.fitness > worst_member.fitness) {
+				worst_member = current_population_member;
+				index_worst_memer_found = member_location; 
 			}
 		}
-		return idx;
+		return index_worst_memer_found;
 	}
 	
 
