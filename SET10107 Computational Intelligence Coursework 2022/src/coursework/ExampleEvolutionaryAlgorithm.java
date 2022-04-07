@@ -432,7 +432,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	
 	
 	/**
-	 * MUTATION
+	 *  Standard MUTATION
 	 */
 	private void mutate(ArrayList<Individual> individuals) {		
 		for(Individual individual : individuals) {
@@ -473,25 +473,15 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	@Override
 	public double activationFunction(double x) {
 		switch(Parameters.activationType) {
-		case ELU:
-		default:
-			if (x > 0) return x;
-			return 0.1 * (Math.pow(Math.E, x) - 1);
 		case HARD_ELISH:
-			if (x < 0) return Math.max(0, Math.min(1, (x + 1) / 2)) * (Math.pow(Math.E, x) - 1);
-			return x * Math.max(0, Math.min(1, (x + 1) / 2));
+			return (x < 0) ? Math.max(0, Math.min(1, (x + 1) / 2)) * (Math.pow(Math.E, x) - 1) :
+				x * Math.max(0, Math.min(1, (x + 1) / 2));
 		case LEAKY_R:
-			if (x > 0) return x;
-			return 0.01 * x;
+			return (x > 0)? x: x/100;
 		case RELU:
-			if (x > 0) return x;
-			return -1;
-		case SELU:
-			if (x > 0) return x * 1.0507009;
-			return 1.0507009 * (1.673263 * Math.pow(Math.E, x)) - 1.673263;
+			return (x > 0) ?  x : -1;
 		case STEP:
-			if (x <= 0) return -1.00;
-			return 1.0;
+			return (x <= 0)? -1.00 : 1.00;
 		case SWISH:
 			return x * (1 / (1 + Math.pow(Math.E, -x)));
 		case TANH:
@@ -501,6 +491,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 				return 1.0;
 			}
 			return Math.tanh(x);
+		default:
+			return (x > 0) ? x : (Math.pow(Math.E, x) - 1) / 10;
 		}
 	}
 }
