@@ -52,44 +52,41 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			}
 	
 			// Generate children_set by crossover
-			ArrayList<Individual> children_set;
+			ArrayList<Individual> children_dataset;
 			switch(Parameters.crossoverType) {
 				case ARITHM:
-					children_set = arithmeticCrossover(first_parent, second_parent);
+					children_dataset = arithmeticCrossover(first_parent, second_parent);
 					break;
 				case ONE_POINT:
-					children_set = onePointCrossover(first_parent, second_parent);
-					break;
-				case TWO_POINTS:
-				default:
-					children_set = twoPointCrossover(first_parent, second_parent);
+					children_dataset = onePointCrossover(first_parent, second_parent);
 					break;
 				case UNIFORM:
-					children_set = uniformCrossover(first_parent, second_parent);
+					children_dataset = uniformCrossover(first_parent, second_parent);
+					break;
+				default:
+					children_dataset = twoPointCrossover(first_parent, second_parent);
 					break;
 			}
 				
-			//mutate the offspring
+			
 			switch(Parameters.mutationType) {
-			case CONSTRAINED:
-				constrainedMutation(children_set);
-				break;
-			case STANDARD:
-			default:
-				mutate(children_set);
-				break;
+				case CONSTRAINED:
+					constrainedMutation(children_dataset);
+					break;
+				default:
+					mutate(children_dataset);
+					break;
 			}
 			
-			evaluateIndividuals(children_set);
-
+			evaluateIndividuals(children_dataset);
 			// Replace children_set in population
 			switch(Parameters.replaceType) {
 				case TOURNAMENT:
 				default:
-					tournamentReplace(children_set);
+					tournamentReplace(children_dataset);
 					break;
 				case WORST:
-					replaceWorst(children_set);
+					replaceWorst(children_dataset);
 					break;
 			}
 			
@@ -101,7 +98,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		saveNeuralNetwork();
 	}
 
-	
 
 	/**
 	 * Sets the fitness of the individuals passed as parameters (whole population)
@@ -182,12 +178,12 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		 * 1 - Pick t solutions completely at random from the population
 		 * 2 - Select the best of the t solutions to be a parent
 		 */
-		final int TOURNAMET_SIZE = Parameters.tournamentSize;
+		final int TOURNAMET_POPULATION_SIZE = Parameters.tournamentSize;
 		
 		Collections.shuffle(population);
 		Individual parent = population
 				.stream()
-				.limit(TOURNAMET_SIZE)
+				.limit(TOURNAMET_POPULATION_SIZE)
 				.sorted((c1, c2) -> c1.compareTo(c2))
 				.findFirst()
 				.orElse(null);
@@ -202,14 +198,13 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 				.sum();
 		
 		// Generate a random number between 0 and weightSum
-		double rand = weightSum * Parameters.random.nextDouble();
+		double random_seed = weightSum * Parameters.random.nextDouble();
 		// Find random value based on weights
 		for(Individual indiv : population) {		
-			rand -= (1 - indiv.fitness);		
-			if(rand < 0) 
+			random_seed -= (1 - indiv.fitness);		
+			if(random_seed < 0) 
 				return indiv;
 		}
-		// When rounding errors occur, return the last item 
 		return population.get(-1);
 	}
 
@@ -221,19 +216,18 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	    }
 
 	    unitize1(fitness);
-
 	    return population.get(random(fitness));
 	}
 	
 
     public static double norm1(double[] x) {
         double normalization = 0.0;
-        
         for (double normalization_value : x) {
         	normalization += Math.abs(normalization_value);
         }
         return normalization;
     }
+    
     public static void unitize1(double[] x) {
         double n = norm1(x);
         for (int i = 0; i < x.length; i++) {
@@ -245,7 +239,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
         int[] ans = random(prob, 1);
         return ans[0];
     }
-    
+
     public static int[] random(double[] prob, int n) {
         // set up alias table
         double[] q = new double[prob.length];
@@ -284,26 +278,88 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
         }
 
         // generate sample
-        int[] ans = new int[n];
+        int[] samples = new int[n];
         for (int i = 0; i < n; i++) {
             double rU = Parameters.random.nextDouble() * prob.length;
 
             int k = (int) (rU);
-            rU -= k;  /* rU becomes rU-[rU] */
+            rU -= k;  
 
             if (rU < q[k]) {
-                ans[i] = k;
+            	samples[i] = k;
             } else {
-                ans[i] = a[k];
+            	samples[i] = a[k];
             }
-        }
+        } 
 
-        return ans;
+        return samples;
+        
     }
 
+	private ArrayList<Individual> arithmeticCrossover(Individual first_parent, Individual second_parent){
+		Individual child = new Individual();
+		for (int i = 0; i < first_parent.chromosome.length; i++){
+			double avgChrom = (first_parent.chromosome[i] + second_parent.chromosome[i]) / 2;
+			child.chromosome[i] = avgChrom;
+		}
+		ArrayList<Individual> children_set = new ArrayList<>();
+		children_set.add(child);
+		return children_set;
+	}
+	
+	/**
+	 * REPLACEMENT
+	 */
+	private void replaceWorst(ArrayList<Individual> individuals) {
+		for(Individual individual : individuals) {
+			int idx = getWorstIndex();		
+			population.set(idx, individual);
+		}		
+	}
+	// Replace using tournament - same as selection but with worst
+	private void tournamentReplace(ArrayList<Individual> individuals) {
+		final int TOURNAMET_SIZE = Parameters.tournamentSize;
+		
+		for (Individual individual : individuals) {
+			Collections.shuffle(population);
+			Individual worstChrom = population
+				.stream()
+				.limit(TOURNAMET_SIZE)
+				.sorted((c1, c2) -> c2.compareTo(c1))
+				.findFirst()
+				.orElse(null);
+
+			population.remove(worstChrom);
+			population.add(individual);
+		}
+	}
 	
 	
-	
+	private void constrainedMutation(ArrayList<Individual> individuals) {		
+		for(Individual individual : individuals) {
+			for (int i = 0; i < individual.chromosome.length; i++) {
+				if (Parameters.random.nextDouble() < Parameters.mutateRate) {
+					if (Parameters.random.nextBoolean()) {
+						double oldFitness = individual.fitness;
+						individual.chromosome[i] += (Parameters.mutateChange);
+						individual.fitness = Fitness.evaluate(individual, this);
+						if (individual.fitness > oldFitness) {
+							// revert if bad choice was made
+							individual.chromosome[i] -= (Parameters.mutateChange);
+						}
+					} else {
+						double oldFitness = individual.fitness;
+						individual.chromosome[i] -= (Parameters.mutateChange);
+						individual.fitness = Fitness.evaluate(individual, this);
+						if (individual.fitness > oldFitness) {
+							// revert if bad choice was made
+							individual.chromosome[i] += (Parameters.mutateChange);
+						}
+					}
+				}
+			}
+		}		
+	}
 
 	/**
 	 * CROSSOVER 
@@ -348,6 +404,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return children_set;
 	}
 	
+	
+	
 	private ArrayList<Individual> twoPointCrossover(Individual first_parent, Individual second_parent){
 		Individual first_children = new Individual();
 		Individual second_children = new Individual();
@@ -371,22 +429,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		children_set.add(second_children);	
 		return children_set;
 	}
-	private ArrayList<Individual> arithmeticCrossover(Individual first_parent, Individual second_parent){
-		Individual child = new Individual();
-		for (int i = 0; i < first_parent.chromosome.length; i++){
-			double avgChrom = (first_parent.chromosome[i] + second_parent.chromosome[i]) / 2;
-			child.chromosome[i] = avgChrom;
-		}
-		ArrayList<Individual> children_set = new ArrayList<>();
-		children_set.add(child);
-		return children_set;
-	}
-	
-	
-	
-	
-	
-	
 	
 	
 	/**
@@ -405,60 +447,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			}
 		}		
 	}
-	private void constrainedMutation(ArrayList<Individual> individuals) {		
-		for(Individual individual : individuals) {
-			for (int i = 0; i < individual.chromosome.length; i++) {
-				if (Parameters.random.nextDouble() < Parameters.mutateRate) {
-					if (Parameters.random.nextBoolean()) {
-						double oldFitness = individual.fitness;
-						individual.chromosome[i] += (Parameters.mutateChange);
-						individual.fitness = Fitness.evaluate(individual, this);
-						if (individual.fitness > oldFitness) {
-							// revert if bad choice was made
-							individual.chromosome[i] -= (Parameters.mutateChange);
-						}
-					} else {
-						double oldFitness = individual.fitness;
-						individual.chromosome[i] -= (Parameters.mutateChange);
-						individual.fitness = Fitness.evaluate(individual, this);
-						if (individual.fitness > oldFitness) {
-							// revert if bad choice was made
-							individual.chromosome[i] += (Parameters.mutateChange);
-						}
-					}
-				}
-			}
-		}		
-	}
-	
-
-	/**
-	 * REPLACEMENT
-	 */
-	private void replaceWorst(ArrayList<Individual> individuals) {
-		for(Individual individual : individuals) {
-			int idx = getWorstIndex();		
-			population.set(idx, individual);
-		}		
-	}
-	// Replace using tournament - same as selection but with worst
-	private void tournamentReplace(ArrayList<Individual> individuals) {
-		final int TOURNAMET_SIZE = Parameters.tournamentSize;
-		
-		for (Individual individual : individuals) {
-			Collections.shuffle(population);
-			Individual worstChrom = population
-				.stream()
-				.limit(TOURNAMET_SIZE)
-				.sorted((c1, c2) -> c2.compareTo(c1))
-				.findFirst()
-				.orElse(null);
-
-			population.remove(worstChrom);
-			population.add(individual);
-		}
-	}
-	
 
 	/*
 	 * getWorstIndex(): iterate the population list, and returns (if this exists, 
@@ -482,7 +470,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	}
 	
 
-	
 	@Override
 	public double activationFunction(double x) {
 		switch(Parameters.activationType) {
