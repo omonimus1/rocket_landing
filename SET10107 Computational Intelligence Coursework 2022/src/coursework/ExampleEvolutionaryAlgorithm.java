@@ -17,15 +17,11 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	@Override
 	public void run() {					
 		// Initialise the population with pseudo-random weights
-		if( Parameters.initialisationType == InitialisationType.AUGMENTED)
-			population = augmentedInitialise();
-		else if( Parameters.initialisationType == InitialisationType.POS_NEG)
+		if( Parameters.initialisationType == InitialisationType.POS_NEG)
 			population = PosNegInitialise();
 		else
 			population = initialise();
 			
-		// Get Individual within the population
-		best = getBest();
 		System.out.println("Best Individual obtained from the population: " + best);
 		
 		// Evolutionary Algorithm processing
@@ -101,6 +97,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			System.out.println("Best Individual obtained from the population: " + best);
 			outputStats();
 		}
+		//save the trained network to disk
+		saveNeuralNetwork();
 	}
 
 	
@@ -144,21 +142,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 		return population;
 	}
 	
-	private ArrayList<Individual> augmentedInitialise() {
-		population = new ArrayList<>();
-		for (int i = 0; i < Parameters.populationSize + 1000; i++) {
-			// chromosome weights are initialised randomly in the constructor
-			Individual individual = new Individual();
-			population.add(individual);
-		}
-		evaluateIndividuals(population);
-		
-		return (ArrayList<Individual>) population
-			.stream()
-			.sorted((c1, c2) -> c1.compareTo(c2))
-			.limit(Parameters.populationSize)
-			.collect(Collectors.toCollection(ArrayList::new));
-	}
 	
 	private ArrayList<Individual> PosNegInitialise() {
 		population = new ArrayList<>();
