@@ -26,20 +26,20 @@ public class Parameters {
 	//set the NeuralNetwork class here to use your code from the GUI
 	public static Class neuralNetworkClass = ExampleEvolutionaryAlgorithm.class;
 	
-	public static int tournamentSize = 10; // final - 10. (select and replace)
+	public static int tournamentSize = 9; 
 	
-	public enum InitialisationType { RANDOM, AUGMENTED, POS_NEG } // augmented is best
+	public enum InitialisationType { POS_NEG, RANDOM,}
 	public enum SelectionCategory { RANDOM_SELECTION, TOURNAMENT, ROULETTE_SELECTION, RANK_SELECTION}
 	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS, ARITHM }
-	public enum MutationType { STANDARD, CONSTRAINED, ANNEALING }
-	public enum ReplaceType { WORST, TOURNAMENT }
+	public enum MutationType { CONSTRAINED, STANDARD, }
+	public enum ReplaceType { TOURNAMENT, WORST  }
 	public enum ActivationType { TANH, STEP, RELU, LEAKY_R, ELU, SELU, 
 		SWISH, HARD_ELISH }
 	
 	public static InitialisationType initialisationType = InitialisationType.POS_NEG;  
 	public static SelectionCategory selectionCategory = SelectionCategory.TOURNAMENT;
 	public static CrossoverType crossoverType = CrossoverType.TWO_POINTS;
-	public static MutationType mutationType = MutationType.STANDARD;
+	public static MutationType mutationType = MutationType.STANDARD; 
 	public static ReplaceType replaceType = ReplaceType.TOURNAMENT;
 	public static ActivationType activationType = ActivationType.SELU;
 	
