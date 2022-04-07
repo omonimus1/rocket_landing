@@ -16,7 +16,6 @@ public class StartNoGui {
 		 * Train the Neural Network using our Evolutionary Algorithm 
 		 * 
 		 */
-
 		//Set the parameters here or directly in the Parameters Class
 		Parameters.maxEvaluations = 20000; // Used to terminate the EA after this many generations
 		Parameters.populationSize = 50; // Population Size
@@ -53,20 +52,10 @@ public class StartNoGui {
 		double fitness = Fitness.evaluate(nn);
 		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness);
 		
-		/**
-		 * Or We can reload the NN from the file generated during training and test it on a data set 
-		 * We can supply a filename or null to open a file dialog 
-		 * Note that files must be in the project root and must be named *-n.txt
-		 * where "n" is the number of hidden nodes
-		 * ie  1518461386696-5.txt was saved at timestamp 1518461386696 and has 5 hidden nodes
-		 * Files are saved automatically at the end of training
-		 *  
-		 */
 		
 		ExampleEvolutionaryAlgorithm nn2 = ExampleEvolutionaryAlgorithm.loadNeuralNetwork("1518446327913-5.txt");
 		Parameters.setDataSet(DataSet.Random);
 		double fitness2 = Fitness.evaluate(nn2);
 		System.out.println("Fitness on " + Parameters.getDataSet() + " " + fitness2);
-		
 	}
 }
