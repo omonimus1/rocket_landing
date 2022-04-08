@@ -21,9 +21,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			population = PosNegInitialise();
 		else
 			population = initialise();
-			
-		System.out.println("Best Individual obtained from the population: " + best);
-		
 		// Evolutionary Algorithm processing
 		while (evaluations < Parameters.maxEvaluations) {
 			
@@ -54,9 +51,6 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			// Generate children_set by crossover
 			ArrayList<Individual> children_dataset;
 			switch(Parameters.crossoverType) {
-				case ARITHM:
-					children_dataset = arithmeticCrossover(first_parent, second_parent);
-					break;
 				case ONE_POINT:
 					children_dataset = onePointCrossover(first_parent, second_parent);
 					break;
@@ -91,7 +85,7 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 			}
 			
 			best = getBest();
-			System.out.println("Best Individual obtained from the population: " + best);
+			// System.out.println("Best Individual obtained from the population: " + best);
 			outputStats();
 		}
 		//save the trained network to disk
@@ -473,17 +467,8 @@ public class ExampleEvolutionaryAlgorithm extends NeuralNetwork {
 	@Override
 	public double activationFunction(double x) {
 		switch(Parameters.activationType) {
-		case HARD_ELISH:
-			return (x < 0) ? Math.max(0, Math.min(1, (x + 1) / 2)) * (Math.pow(Math.E, x) - 1) :
-				x * Math.max(0, Math.min(1, (x + 1) / 2));
-		case LEAKY_R:
-			return (x > 0)? x: x/100;
 		case RELU:
 			return (x > 0) ?  x : -1;
-		case STEP:
-			return (x <= 0)? -1.00 : 1.00;
-		case SWISH:
-			return x * (1 / (1 + Math.pow(Math.E, -x)));
 		case TANH:
 			if (x < -20.0) {
 				return -1.0;
