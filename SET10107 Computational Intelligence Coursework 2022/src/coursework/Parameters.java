@@ -30,11 +30,10 @@ public class Parameters {
 	
 	public enum InitialisationType { POS_NEG, RANDOM,}
 	public enum SelectionCategory { RANDOM_SELECTION, TOURNAMENT, ROULETTE_SELECTION, RANK_SELECTION}
-	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS, ARITHM }
-	public enum MutationType { CONSTRAINED, STANDARD, }
+	public enum CrossoverType { UNIFORM, ONE_POINT, TWO_POINTS}
+	public enum MutationType { CONSTRAINED, STANDARD }
 	public enum ReplaceType { TOURNAMENT, WORST  }
-	public enum ActivationType { TANH, STEP, RELU, LEAKY_R, ELU, SELU, 
-		SWISH, HARD_ELISH }
+	public enum ActivationType { RELU, TANH, SELU}
 	
 	public static InitialisationType initialisationType = InitialisationType.POS_NEG;  
 	public static SelectionCategory selectionCategory = SelectionCategory.TOURNAMENT;
