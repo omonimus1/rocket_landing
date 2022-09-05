@@ -13,4 +13,7 @@ Instead, this project runs the EA 20.000 times; To optimize the training time, a
 
 ## Results obtained:
 * Average fitness score: 0.145 (against 14.8 produceded by the given project template).
-* 
+
+
+## Apply for a mentorship session with me (get a 7 days free trial)
+<a href="https://mentorcruise.com/mentor/davidepollicino/"> <img src="https://cdn.mentorcruise.com/img/banner/navy-mentoring-badge.svg" width="240" alt="MentorCruise"> </a>
